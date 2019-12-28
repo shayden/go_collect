@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // MediaFile describes a media file
@@ -25,7 +26,7 @@ func walk(path string, info os.FileInfo, err error) error {
 		return err
 	}
 
-	switch filepath.Ext(path) {
+	switch strings.ToLower(filepath.Ext(path)) {
 	case ".jpg", ".jpeg", ".gif", ".png", ".mov", ".mp4":
 		files = append(files, MediaFile{
 			absolutePath: path,

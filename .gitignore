@@ -6,4 +6,6 @@
 *.mp4
 *.mov
 *.exe
+*.nef
+*.cr2
 go_collect

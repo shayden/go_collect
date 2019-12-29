@@ -5,3 +5,5 @@
 *.png
 *.mp4
 *.mov
+*.exe
+go_collect

@@ -101,9 +101,21 @@ func parseExifData(path string) string {
 		return nil
 	}
 
-	f, _ := os.Open(path)
-	data, _ := ioutil.ReadAll(f)
+	f, err := os.Open(path)
+	if err != nil {
+		fmt.Println(err)
+		return "{}"
+	}
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		fmt.Println(err)
+		return "{}"
+	}
 	rawExif, _ := exif.SearchAndExtractExif(data)
+	if err != nil {
+		fmt.Println(err)
+		return "{}"
+	}
 	exif.Visit(exif.IfdStandard, im, ti, rawExif, visitor)
 
 	exifData, _ := json.Marshal(entries)

@@ -26,6 +26,9 @@ func walk(path string, info os.FileInfo, err error) error {
 		fmt.Println(err)
 		return err
 	}
+	if strings.HasPrefix(path, ".") {
+		return nil
+	}
 
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".jpg", ".jpeg", ".gif", ".png", ".mov", ".mp4", ".nef", ".cr2":

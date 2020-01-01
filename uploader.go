@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func uploadFile(path string) {
@@ -38,8 +39,12 @@ func uploadFile(path string) {
 	}
 	fmt.Printf("Wrote %v kb\n", written>>10)
 
+	part, err = writer.CreateFormFile("metadata", "test.json")
+	io.Copy(part, strings.NewReader(`{"jsonKey": "this is some json"}`))
+
 	// don't forget to close the writer before you make the request dingus
 	writer.Close()
+
 	req, _ := http.NewRequest("POST", "http://localhost:8081/file", body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 

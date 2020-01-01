@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 )
@@ -18,10 +17,6 @@ func main() {
 		return
 	}
 
-	files := WalkPath(*rootDir, *drive)
-	for _, file := range files {
-		data, _ := json.Marshal(file)
-		fmt.Println(string(data))
-	}
+	WalkPathAndUploadFindings(*rootDir, *drive)
 
 }

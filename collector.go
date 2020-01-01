@@ -18,7 +18,6 @@ type MediaFile struct {
 	Size         int64      `json:"size_in_kb"`
 }
 
-var files []MediaFile
 var drivename string
 
 func walk(path string, info os.FileInfo, err error) error {
@@ -74,12 +73,12 @@ func walk(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-// WalkPath Returns a list of media files starting at root
-func WalkPath(root, dname string) []MediaFile {
+// WalkPathAndUploadFindings Returns a list of media files starting at root
+func WalkPathAndUploadFindings(root, dname string) {
 	drivename = dname
 	err := filepath.Walk(root, walk)
 	if err != nil {
 		fmt.Println(err)
 	}
-	return files
+	return
 }

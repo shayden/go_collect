@@ -26,21 +26,50 @@ func walk(path string, info os.FileInfo, err error) error {
 		fmt.Println(err)
 		return err
 	}
+	// aperture & imovie create (i'm guessing) thumbnails or smaller res caches
+	// we don't want them
 	if strings.HasPrefix(path, ".") {
 		return nil
 	}
+	hc := make(chan int)
+	exifc := make(chan int)
+	uc := make(chan int)
+	fupc := make(chan int)
 
 	switch strings.ToLower(filepath.Ext(path)) {
 	case ".jpg", ".jpeg", ".gif", ".png", ".mov", ".mp4", ".nef", ".cr2":
-		files = append(files, MediaFile{
-			AbsolutePath: path,
+		abs, _ := filepath.Abs(path)
+		mf := &MediaFile{
+			AbsolutePath: abs,
 			FileName:     info.Name(),
 			Extension:    filepath.Ext(path),
 			Drivename:    drivename,
 			Size:         info.Size() >> 10,
-			Sha256:       HashFile(path),
-			ExifData:     ParseExifData(path),
-		})
+		}
+		go func(mf *MediaFile, path string) {
+			mf.Sha256 = HashFile(path)
+			hc <- 1
+		}(mf, path)
+
+		go func(mf *MediaFile, path string) {
+			mf.ExifData = ParseExifData(path)
+			exifc <- 1
+		}(mf, path)
+
+		go func(path string) {
+			fmt.Println("Begin file upload")
+			uploadFile(path)
+			fmt.Println("Finish file upload")
+			fupc <- 1
+		}(path)
+		<-hc
+		<-exifc
+		go func(mf *MediaFile) {
+			uploadMetadata(mf)
+			uc <- 1
+		}(mf)
+		<-fupc
+		<-uc
 	}
 	return nil
 }

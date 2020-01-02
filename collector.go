@@ -55,16 +55,20 @@ func walk(path string, info os.FileInfo, err error) error {
 			exifc <- 1
 		}(mf, path)
 
+		<-hc
+		var dupe bool
 		go func(path string) {
-			fmt.Println("Begin file upload")
-			uploadFile(path)
-			fmt.Println("Finish file upload")
+			dupe, err = DupeCheck(mf.Sha256)
+			if !dupe {
+				uploadFile(path)
+			}
 			fupc <- 1
 		}(path)
-		<-hc
 		<-exifc
 		go func(mf *MediaFile) {
-			uploadMetadata(mf)
+			if !dupe {
+				uploadMetadata(mf)
+			}
 			uc <- 1
 		}(mf)
 		<-fupc

@@ -59,6 +59,10 @@ func walk(path string, info os.FileInfo, err error) error {
 		var dupe bool
 		go func(path string) {
 			dupe, err = DupeCheck(mf.Sha256)
+			if err != nil {
+				fmt.Println(err)
+				dupe = true // skip this one
+			}
 			if !dupe {
 				uploadFile(path)
 			}
